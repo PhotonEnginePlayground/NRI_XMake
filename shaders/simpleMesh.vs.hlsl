@@ -13,12 +13,14 @@ struct inputVS
 {
     float3 in_position : POSITION0;
     float2 in_texcoord : TEXCOORD0;
+    float3 in_normal : NORMAL;
 };
 
 struct outputVS
 {
     float4 position : SV_Position;
     float2 texCoord : TEXCOORD0;
+    float3 normal : NORMAL;
 };
 
 outputVS main(inputVS input)
@@ -28,5 +30,6 @@ outputVS main(inputVS input)
 	float4x4 mvpMat = mul(projectMat, vpMat);
 	output.position = mul(mvpMat, float4(input.in_position.xyz, 1.0));
     output.texCoord = input.in_texcoord;
+    // output.normal = input.in_normal;
     return output;
 }

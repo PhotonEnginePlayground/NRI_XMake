@@ -27,8 +27,9 @@ struct ConstantBufferLayout {
 struct Vertex {
 	vec3 position;
 	vec2 uv;
-	Vertex(vec3 pos, vec2 uv) :
-			position(pos), uv(uv) {}
+	vec3 normal;
+	Vertex(vec3 pos, vec2 uv, vec3 nor) :
+			position(pos), uv(uv), normal(nor) {}
 };
 
 static uint32_t g_indexCount = 0;
@@ -258,7 +259,7 @@ bool Sample::Initialize(nri::GraphicsAPI graphicsAPI) {
 		vertexStreamDesc.bindingSlot = 0;
 		vertexStreamDesc.stride = sizeof(Vertex);
 
-		nri::VertexAttributeDesc vertexAttributeDesc[2] = {};
+		nri::VertexAttributeDesc vertexAttributeDesc[3] = {};
 		{
 			vertexAttributeDesc[0].format = nri::Format::RGB32_SFLOAT;
 			vertexAttributeDesc[0].streamIndex = 0;
@@ -271,6 +272,12 @@ bool Sample::Initialize(nri::GraphicsAPI graphicsAPI) {
 			vertexAttributeDesc[1].offset = helper::GetOffsetOf(&Vertex::uv);
 			vertexAttributeDesc[1].d3d = { "TEXCOORD", 0 };
 			vertexAttributeDesc[1].vk.location = { 1 };
+
+			vertexAttributeDesc[2].format = nri::Format::RGB32_SFLOAT;
+			vertexAttributeDesc[2].streamIndex = 0;
+			vertexAttributeDesc[2].offset = helper::GetOffsetOf(&Vertex::normal);
+			vertexAttributeDesc[2].d3d = { "NORMAL", 0 };
+			vertexAttributeDesc[2].vk.location = { 2 };
 		}
 
 		nri::VertexInputDesc vertexInputDesc = {};
@@ -349,7 +356,7 @@ bool Sample::Initialize(nri::GraphicsAPI graphicsAPI) {
 	// Load texture
 	utils::Texture texture;
 	std::string path =
-			utils::GetFullPath("wood1.png", utils::DataFolder::TEXTURES);
+			utils::GetFullPath("Duck_baseColor.png", utils::DataFolder::TEXTURES);
 	if (!utils::LoadTexture(path, texture)) {
 		return false;
 	}
@@ -364,7 +371,8 @@ bool Sample::Initialize(nri::GraphicsAPI graphicsAPI) {
 	for (unsigned int i = 0; i != mesh->mNumVertices; i++) {
 		const aiVector3D v = mesh->mVertices[i];
 		const aiVector3D uv0 = mesh->mTextureCoords[0][i];
-		positions.push_back({ vec3(v.x, v.y, v.z), vec2(uv0.x, uv0.y) });
+		const aiVector3D n = mesh->mNormals[i];
+		positions.push_back({ vec3(v.x, v.y, v.z), vec2(uv0.x, uv0.y), vec3(n.x, n.y, n.z) });
 	}
 
 	for (unsigned int i = 0; i != mesh->mNumFaces; i++) {
@@ -535,11 +543,13 @@ bool Sample::Initialize(nri::GraphicsAPI graphicsAPI) {
 		textureData.texture = m_Texture;
 		textureData.after = { nri::AccessBits::SHADER_RESOURCE,
 			nri::Layout::SHADER_RESOURCE };
+		textureData.planes = nri::PlaneBits::ALL;
 
 		nri::TextureUploadDesc textureData1;
 		textureData1.subresources = nullptr;
 		textureData1.texture = m_DepthTexture;
 		textureData1.after = { nri::AccessBits::DEPTH_STENCIL_ATTACHMENT_WRITE, nri::Layout::DEPTH_STENCIL_ATTACHMENT };
+		textureData1.planes = nri::PlaneBits::DEPTH;
 
 		nri::BufferUploadDesc bufferData = {};
 		bufferData.buffer = m_GeometryBuffer;

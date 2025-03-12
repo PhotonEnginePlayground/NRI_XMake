@@ -358,7 +358,7 @@ const char* utils::GetFileName(const std::string& path) {
 //========================================================================================================================
 
 std::string utils::GetFullPath(const std::string& localPath, DataFolder dataFolder) {
-    std::string path = "_Data/"; // it's a symbolic link
+    std::string path = "data/"; // it's a symbolic link
     if (dataFolder == DataFolder::SHADERS)
         path = "_Shaders/"; // special folder with generated files
     else if (dataFolder == DataFolder::TEXTURES)
