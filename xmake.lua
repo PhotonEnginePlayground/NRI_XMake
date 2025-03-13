@@ -53,6 +53,7 @@ target("DemoApp")
     set_kind("binary")
     add_deps("NRIFramework", "Detex", "NRI", "ImGUI")
     add_includedirs("3rd/NRI_Framework/Include", {public = true})
+    add_includedirs("3rd/Detex", {public = true})
     add_packages("glfw", "glm", "assimp")
     add_files("main.cpp")
 

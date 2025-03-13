@@ -35,3 +35,4 @@ install.log
 build
 .vscode
 .history/**
+!3rd/**
